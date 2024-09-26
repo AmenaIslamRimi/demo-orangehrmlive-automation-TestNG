@@ -160,7 +160,50 @@ public class PIMTestRunner extends Setup {
         Assert.assertTrue(searchResultText.contains("Record Found"));
 
     }
-    @Test(priority = 8, description = "Admin search for created employee in Directory")
+
+    @Test(priority = 8, description = "Admin search for created employee in Directory with wrong name")
+    public void searchUserInDirectoryWithMisspelledName() throws InterruptedException, IOException, ParseException {
+        pimPage = new PIMPage(driver);
+        pimPage.leftMenuBar.get(8).click();
+        Thread.sleep(5000);
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
+        WebElement searchByName = driver.findElement(By.cssSelector("[placeholder = 'Type for hints...']"));
+        searchByName.sendKeys(" ABC");
+        Thread.sleep(4000);
+
+        //System.out.println("EmployeeId: " + empIdToSearch);
+        WebElement searchBtn = driver.findElement(By.cssSelector("[type='submit']"));
+        searchBtn.click();
+
+        WebElement searchResult = driver.findElement(By.className("oxd-input-field-error-message"));
+        String searchResultText = searchResult.getText();
+        Assert.assertTrue(searchResultText.contains("Invalid"));
+
+    }
+    @Test(priority = 9, description = "Admin search for created employee in Directory with empty field")
+    public void searchUserInDirectoryWithEmptyField() throws InterruptedException, IOException, ParseException {
+        pimPage = new PIMPage(driver);
+        pimPage.leftMenuBar.get(8).click();
+        Thread.sleep(5000);
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
+        WebElement searchByName = driver.findElement(By.cssSelector("[placeholder = 'Type for hints...']"));
+        searchByName.sendKeys(" ");
+        Thread.sleep(4000);
+
+        //System.out.println("EmployeeId: " + empIdToSearch);
+        WebElement searchBtn = driver.findElement(By.cssSelector("[type='submit']"));
+        searchBtn.click();
+
+        WebElement searchResult = driver.findElement(By.className("oxd-input-field-error-message"));
+        String searchResultText = searchResult.getText();
+        Assert.assertTrue(searchResultText.contains("Invalid"));
+
+    }
+    @Test(priority = 10, description = "Admin search for created employee in Directory")
     public void searchUserInDirectory() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.leftMenuBar.get(8).click();
@@ -192,7 +235,7 @@ public class PIMTestRunner extends Setup {
 
     }
 
-    //@Test(priority = 9)
+    @Test(priority = 9)
     public void doLogout(){
         LoginPage loginPage = new LoginPage(driver);
         loginPage.doLogout();

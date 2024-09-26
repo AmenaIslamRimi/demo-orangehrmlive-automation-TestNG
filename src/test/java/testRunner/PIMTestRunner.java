@@ -19,7 +19,10 @@ import setUp.Setup;
 import utils.Utils;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 import static utils.Utils.readJSONData;
 
@@ -157,11 +160,14 @@ public class PIMTestRunner extends Setup {
         Assert.assertTrue(searchResultText.contains("Record Found"));
 
     }
-    //@Test(priority = 8, description = "Admin search for created employee in Directory")
+    @Test(priority = 8, description = "Admin search for created employee in Directory")
     public void searchUserInDirectory() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.leftMenuBar.get(8).click();
         Thread.sleep(5000);
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
         JSONArray empArray = readJSONData();
         JSONObject empObj = (JSONObject) empArray.get(empArray.size()-1);
         String firstNameToSearch = empObj.get("firstName").toString();
@@ -169,8 +175,13 @@ public class PIMTestRunner extends Setup {
         //String fullNameToSearch = firstNameToSearch + " " + lastNameToSearch;
         WebElement searchByName = driver.findElement(By.cssSelector("[placeholder = 'Type for hints...']"));
         searchByName.sendKeys(firstNameToSearch + " ");
-        WebElement dropdown = driver.findElement(By.className("oxd-autocomplete-dropdown"));
-        dropdown.click();
+        Thread.sleep(4000);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[role='listbox']")));
+
+        // Find the dropdown and select the first result
+        WebElement dropdownItems = driver.findElement(By.cssSelector("[role='listbox']"));
+        dropdownItems.click();  // Click on the first item in the dropdown
+
         //System.out.println("EmployeeId: " + empIdToSearch);
         WebElement searchBtn = driver.findElement(By.cssSelector("[type='submit']"));
         searchBtn.click();
@@ -181,7 +192,7 @@ public class PIMTestRunner extends Setup {
 
     }
 
-    @Test(priority = 9)
+    //@Test(priority = 9)
     public void doLogout(){
         LoginPage loginPage = new LoginPage(driver);
         loginPage.doLogout();

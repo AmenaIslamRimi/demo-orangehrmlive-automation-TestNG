@@ -10,7 +10,7 @@
             <class name="testRunner.PIMTestRunner"></class>
         </classes>
     </test>
-    <test name="Create New Employee">
+    <test name="New Employee Login">
         <classes>
             <class name="testRunner.UserLoginTestRunner"></class>
         </classes>

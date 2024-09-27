@@ -44,6 +44,6 @@ public class Utils {
     public static void scroll(WebDriver driver) {
         // Scroll down
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollBy(0,350)");
+        js.executeScript("window.scrollBy(0,430)");
     }
 }

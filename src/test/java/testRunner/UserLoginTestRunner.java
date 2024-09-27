@@ -1,5 +1,6 @@
 package testRunner;
 
+import jdk.jshell.execution.Util;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -81,15 +82,24 @@ public class UserLoginTestRunner extends Setup {
         Thread.sleep(2000);
 
 
-        WebElement bloodGroup = driver.findElements(By.className("oxd-select-text-input")).get(2);
+        WebElement bloodGroup = driver.findElements(By.className("oxd-select-text")).get(2);
         bloodGroup.click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[role='listbox']")));
         WebElement selectBloodGroup = driver.findElement(By.cssSelector("[role='listbox']"));
-        selectBloodGroup.getAttribute("O+");
-        Thread.sleep(2000);
+        String bloodGroupValue = selectBloodGroup.getText();
+        String expectedBloodGroup = "O+";
+
+
+        Thread.sleep(3000);
 
         WebElement saveBtn2 = driver.findElements(By.cssSelector("[type='submit']")).get(1);
         saveBtn2.click();
+        Thread.sleep(2000);
+        WebElement myInfo_Btn2 = driver.findElements(By.className("oxd-main-menu-item--name")).get(2);
+        myInfo_Btn2.click();
+        Thread.sleep(3000);
+        Utils.scroll(driver);
+        Thread.sleep(3000);
 
     }
 

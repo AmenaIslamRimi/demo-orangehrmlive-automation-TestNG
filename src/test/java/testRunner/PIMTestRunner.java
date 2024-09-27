@@ -213,6 +213,7 @@ public class PIMTestRunner extends Setup {
         //System.out.println("EmployeeId: " + empIdToSearch);
         WebElement searchBtn = driver.findElement(By.cssSelector("[type='submit']"));
         searchBtn.click();
+        Utils.scroll(driver);
         Thread.sleep(3000);
         WebElement searchResult = driver.findElements(By.className("oxd-text")).get(14);
         String searchResultText = searchResult.getText();

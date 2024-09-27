@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import pages.LoginPage;
 import pages.PIMPage;
 import setUp.EmployeeModel;
+import setUp.PasswordGenerate;
 import setUp.Setup;
 import utils.Utils;
 
@@ -44,19 +45,44 @@ public class PIMTestRunner extends Setup {
         String messageExpected = "Records Found";
         Assert.assertTrue(messageActual.contains(messageExpected));
     }
-    //@Test(priority = 2, description = "Admin create employee with missing name field")
-    public void createEmployeeWithMissingValue() throws InterruptedException{
+    @Test(priority = 2, description = "Admin create employee with missing First name field")
+    public void createEmployeeWithMissingFirstName() throws InterruptedException{
         pimPage = new PIMPage(driver);
         pimPage.addEmployee_Btn.get(2).click();
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         driver.findElement(By.className("oxd-switch-input")).click();
         EmployeeModel employee = new EmployeeModel("", "Doe", "1234", "johndoe", "P@ssword123", "P@ssword123");
         pimPage.createEmployee(employee);
         String messageActual = driver.findElements(By.className("oxd-input-field-error-message")).get(0).getText();
         String messageExpected = "Required";
         Assert.assertTrue(messageActual.contains(messageExpected));
+
     }
-    //@Test(priority = 3, description = "Admin create employee with same username")
+    @Test(priority = 3, description = "Admin create employee with missing last name field")
+    public void createEmployeeWithMissingSecondName() throws InterruptedException{
+        pimPage = new PIMPage(driver);
+        pimPage.addEmployeeNav_Btn.get(2).click();
+        Thread.sleep(2000);
+        driver.findElement(By.className("oxd-switch-input")).click();
+        EmployeeModel employee = new EmployeeModel("John", "", "1234", "johndoe", "P@ssword123", "P@ssword123");
+        pimPage.createEmployee(employee);
+        String messageActual = driver.findElements(By.className("oxd-input-field-error-message")).get(0).getText();
+        String messageExpected = "Required";
+        Assert.assertTrue(messageActual.contains(messageExpected));
+    }
+    @Test(priority = 4, description = "Admin create employee with less than 5 characters username")
+    public void createEmployeeWithShortUsername() throws InterruptedException{
+        pimPage = new PIMPage(driver);
+        pimPage.addEmployeeNav_Btn.get(2).click();
+        Thread.sleep(3000);
+        driver.findElement(By.className("oxd-switch-input")).click();
+        EmployeeModel employee = new EmployeeModel("john", "Doe", "1234", "aa", "P@ssword123", "P@ssword123");
+        pimPage.createEmployee(employee);
+        String messageActual = driver.findElements(By.className("oxd-input-field-error-message")).get(0).getText();
+        String messageExpected = "Should be at least 5 characters";
+        Assert.assertTrue(messageActual.contains(messageExpected));
+    }
+    @Test(priority = 5, description = "Admin create employee with same username")
     public void createEmployeeWithExistedUsername() throws InterruptedException{
         pimPage = new PIMPage(driver);
         pimPage.addEmployeeNav_Btn.get(2).click();
@@ -69,7 +95,35 @@ public class PIMTestRunner extends Setup {
         Assert.assertTrue(messageActual.contains(messageExpected));
     }
 
-    //@Test(priority = 4, description = "Admin create employee but password and confirm password are not matched")
+    @Test(priority = 6, description = "Admin create employee but password is weak-at least need 7 characters")
+    public void createEmployeeWithWeakPassword() throws InterruptedException {
+        pimPage = new PIMPage(driver);
+        pimPage.addEmployeeNav_Btn.get(2).click();
+        Thread.sleep(3000);
+        driver.findElement(By.className("oxd-switch-input")).click();
+        EmployeeModel employee = new EmployeeModel("john", "Doe", "1234", "johndoe", "pass", "pass");
+        pimPage.createEmployee(employee);
+        String messageActual = driver.findElements(By.className("oxd-input-field-error-message")).get(0).getText();
+        Thread.sleep(2000);
+        String messageExpected = "Should have at least 7 characters";
+        Assert.assertTrue(messageActual.contains(messageExpected));
+    }
+
+    @Test(priority = 7, description = "Admin create employee but password is weak-minimum need 1 number")
+    public void createEmployeeWithWeakPasswordNoNum() throws InterruptedException {
+        pimPage = new PIMPage(driver);
+        pimPage.addEmployeeNav_Btn.get(2).click();
+        Thread.sleep(3000);
+        driver.findElement(By.className("oxd-switch-input")).click();
+        EmployeeModel employee = new EmployeeModel("john", "Doe", "1234", "johndoe", "password", "password");
+        pimPage.createEmployee(employee);
+        String messageActual = driver.findElements(By.className("oxd-input-field-error-message")).get(0).getText();
+        Thread.sleep(2000);
+        String messageExpected = "Your password must contain minimum 1 number";
+        Assert.assertTrue(messageActual.contains(messageExpected));
+    }
+
+    @Test(priority = 8, description = "Admin create employee but password and confirm password are not matched")
     public void createEmployeeWithMismatchedPassword() throws InterruptedException{
         pimPage = new PIMPage(driver);
         pimPage.addEmployeeNav_Btn.get(2).click();
@@ -81,7 +135,9 @@ public class PIMTestRunner extends Setup {
         String messageExpected = "Passwords do not match";
         Assert.assertTrue(messageActual.contains(messageExpected));
     }
-    @Test(priority = 5, description = "Admin create employee")
+
+
+    @Test(priority = 9, description = "Admin create employee with all correct value")
     public void createEmployee() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.addEmployeeNav_Btn.get(2).click();
@@ -98,8 +154,11 @@ public class PIMTestRunner extends Setup {
         WebElement empIdElement = driver.findElements(By.className("oxd-input")).get(4);
         String employeeId = empIdElement.getAttribute("_value");
         String username = faker.name().username();
-        String password = "P@ssword123";
-        String confirm_password = "P@ssword123";
+
+        PasswordGenerate passwordGenerate = new PasswordGenerate();
+        String password = passwordGenerate.generatePassword();
+        String confirm_password = password;
+
 
         EmployeeModel model = new EmployeeModel();
         model.setFirstName(firstname);
@@ -123,7 +182,7 @@ public class PIMTestRunner extends Setup {
         Utils.saveUsers(model);
 
     }
-    @Test(priority = 6, description = "Admin search for created employee with wrong employee id")
+    @Test(priority = 10, description = "Admin search for created employee with wrong employee id")
     public void searchCurrentUserWithWrongId() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.leftMenuBar.get(1).click();
@@ -141,7 +200,7 @@ public class PIMTestRunner extends Setup {
         String searchResultText = searchResult.getText();
         Assert.assertTrue(searchResultText.contains("No Records Found"));
     }
-    @Test(priority = 7, description = "Admin search for created employee")
+    @Test(priority = 11, description = "Admin search for created employee")
     public void searchCurrentUser() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.leftMenuBar.get(1).click();
@@ -161,7 +220,7 @@ public class PIMTestRunner extends Setup {
 
     }
 
-    @Test(priority = 8, description = "Admin search for created employee in Directory with wrong name")
+    @Test(priority = 12, description = "Admin search for created employee in Directory with wrong name")
     public void searchUserInDirectoryWithMisspelledName() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.leftMenuBar.get(8).click();
@@ -182,7 +241,7 @@ public class PIMTestRunner extends Setup {
         Assert.assertTrue(searchResultText.contains("Invalid"));
 
     }
-    @Test(priority = 9, description = "Admin search for created employee in Directory with empty field")
+    @Test(priority = 13, description = "Admin search for created employee in Directory with empty field")
     public void searchUserInDirectoryWithEmptyField() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.leftMenuBar.get(8).click();
@@ -203,7 +262,7 @@ public class PIMTestRunner extends Setup {
         Assert.assertTrue(searchResultText.contains("Invalid"));
 
     }
-    @Test(priority = 10, description = "Admin search for created employee in Directory")
+    @Test(priority = 14, description = "Admin search for created employee with accurate value in Directory")
     public void searchUserInDirectory() throws InterruptedException, IOException, ParseException {
         pimPage = new PIMPage(driver);
         pimPage.leftMenuBar.get(8).click();
@@ -235,26 +294,12 @@ public class PIMTestRunner extends Setup {
 
     }
 
-    @Test(priority = 9)
+    @Test(priority = 15)
     public void doLogout(){
         LoginPage loginPage = new LoginPage(driver);
         loginPage.doLogout();
         Assert.assertTrue(loginPage.loginpage_title.isDisplayed());
     }
-
-    //@Test(priority = 5, description = "Admin create employee but password is weak")
-//    public void createEmployeeWithWeakPassword() throws InterruptedException {
-//        pimPage = new PIMPage(driver);
-//        pimPage.addEmployeeNav_Btn.get(2).click();
-//        Thread.sleep(3000);
-//        driver.findElement(By.className("oxd-switch-input")).click();
-//        pimPage.createEmployee("test62", "user78", "0123", "test62user78", "pass123", "pass123");
-//        String messageActual = driver.findElements(By.className("oxd-input-field-error-message")).get(0).getText();
-//        Thread.sleep(2000);
-//        String messageExpected = "Should have at least 7 characters";
-//        Assert.assertTrue(messageActual.contains(messageExpected));
-//    }
-
 
 
 }

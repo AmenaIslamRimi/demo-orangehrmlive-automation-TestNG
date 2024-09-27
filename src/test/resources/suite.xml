@@ -10,5 +10,9 @@
             <class name="testRunner.PIMTestRunner"></class>
         </classes>
     </test>
-
+    <test name="Create New Employee">
+        <classes>
+            <class name="testRunner.UserLoginTestRunner"></class>
+        </classes>
+    </test>
 </suite>
